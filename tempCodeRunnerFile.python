@@ -1,0 +1,42 @@
+# Contents of /multithreaded-program/multithreaded-program/src/main.py
+
+import threading
+import time
+import numpy as np
+# Shared variable
+variable_a = 0
+# Event to signal Thread A to stop
+stop_event = threading.Event()
+i=0
+def thread_a():
+    global variable_a
+    global i
+    while not stop_event.is_set():
+        variable_a += 1
+        variable_a = np.sin(variable_a)
+        i=i+1
+          # Simulate work
+
+def thread_b():
+    time.sleep(2.0000)  # Simulate some work
+    stop_event.set()  # Signal Thread A to stop
+    print(f"Final value of variable A: {variable_a}")
+    print(f"Final value of i: {i}")
+
+if __name__ == "__main__":
+    # Create threads
+    t_a = threading.Thread(target=thread_a)
+    t_b = threading.Thread(target=thread_b)
+
+    # Start threads
+    t_a.start()
+    t_b.start()
+
+    # Wait for Thread B to finish
+    start_time = time.time()
+    t_b.join()
+    # Wait for Thread A to finish
+    
+    end_time = time.time()
+    print(f"运行时间: {end_time - start_time} 秒")
+    t_a.join()
