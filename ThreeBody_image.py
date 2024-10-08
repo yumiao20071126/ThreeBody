@@ -8,7 +8,6 @@ from ThreeBody_algorithm import star
 
 frame=None
 
-
 def draw_circle(frame, star):
     x_image = int(star.x + 500)
     y_image = int(star.y + 500)
