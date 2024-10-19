@@ -1,1 +1,1 @@
-star.m**(1/3)/2
+        move(stars, spaceships, momentum_weapon, 0.1)

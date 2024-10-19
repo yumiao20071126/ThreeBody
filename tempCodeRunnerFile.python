@@ -1,42 +1,35 @@
-# Contents of /multithreaded-program/multithreaded-program/src/main.py
-
-import threading
+import cv2
 import time
 import numpy as np
-# Shared variable
-variable_a = 0
-# Event to signal Thread A to stop
-stop_event = threading.Event()
-i=0
-def thread_a():
-    global variable_a
-    global i
-    while not stop_event.is_set():
-        variable_a += 1
-        variable_a = np.sin(variable_a)
-        i=i+1
-          # Simulate work
 
-def thread_b():
-    time.sleep(2.0000)  # Simulate some work
-    stop_event.set()  # Signal Thread A to stop
-    print(f"Final value of variable A: {variable_a}")
-    print(f"Final value of i: {i}")
+def press_a(key, last_key_time, key_a_pressed, key_a_released):
+    current_time = time.time()
+    if key == ord('a'):
+        if not key_a_pressed:
+            print("a")
+            key_a_pressed = True
+            key_a_released = False
+            last_key_time = current_time
+    else:
+        if key_a_pressed and not key_a_released:
+            key_a_released = True
+            key_a_pressed = False
 
-if __name__ == "__main__":
-    # Create threads
-    t_a = threading.Thread(target=thread_a)
-    t_b = threading.Thread(target=thread_b)
+    return last_key_time, key_a_pressed, key_a_released
 
-    # Start threads
-    t_a.start()
-    t_b.start()
+last_key_time = 0
+key_a_pressed = False
+key_a_released = True
 
-    # Wait for Thread B to finish
-    start_time = time.time()
-    t_b.join()
-    # Wait for Thread A to finish
-    
-    end_time = time.time()
-    print(f"运行时间: {end_time - start_time} 秒")
-    t_a.join()
+while True:
+    frame = np.zeros((300, 300, 3), dtype=np.uint8)
+
+    # 显示帧
+    cv2.imshow('Moving Dot', frame)
+    key = cv2.waitKey(int(10))
+    last_key_time, key_a_pressed, key_a_released = press_a(key, last_key_time, key_a_pressed, key_a_released)
+
+    if key == ord('q'):
+        break
+
+cv2.destroyAllWindows()
