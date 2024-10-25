@@ -2,6 +2,10 @@
 
 import numpy as np
 import time
+
+#这个文件包含了最基本的平方反比引力公式
+
+#恒星类，包含坐标和速度和质量，飞船类似，只不过会将m设为0
 class star:
     def __init__(self, x, y, vx, vy, m):
         self.x = x
@@ -36,7 +40,8 @@ def Gravity(star_1, star_2, dt):
     # star_2.vy -= ay * dt
     return star_1
 
-# def ThreeBody(x0, y0, z0, vx0, vy0, vz0, dt, n):
+
+#根据每个星体（飞船）的速度，更新位置
 def velocity(star,star_, dt):
     star.x += (star.vx+star_.vx) * dt/2
     star.y += (star.vy+star_.vy) * dt/2
