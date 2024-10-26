@@ -21,6 +21,93 @@ def abs(x):
     else:
         return x
 
+class All:
+    def __init__(self,stars,spaceships,momentum_weapon,scale,bias_x,bias_y,last_creation_time_0,last_presstime_0,last_creation_time_1,last_presstime_1):
+        self.stars=stars
+        self.spaceships=spaceships
+        self.momentum_weapon=momentum_weapon
+        self.scale=scale
+        self.bias_x=bias_x
+        self.bias_y=bias_y
+        self.last_creation_time_0=last_creation_time_0
+        self.last_presstime_0=last_presstime_0
+        self.last_creation_time_1=last_creation_time_1
+        self.last_presstime_1=last_presstime_1
+
+def run(all):
+    # 调用各个文件中的总函数
+
+    # 删除出界的星体和飞船
+    delete(all.stars, all.spaceships, all.momentum_weapon)
+
+    # 引力场移动星体和飞船
+    move(all.stars, all.spaceships, all.momentum_weapon, 0.1)
+
+    # 创建一个黑色背景的帧
+    frame = np.zeros((1000, 1000, 3), dtype=np.uint8)
+
+    # 画图
+    frame = DrawImage(frame, all.stars, all.spaceships, all.momentum_weapon, all.scale, all.bias_x, all.bias_y)
+
+    # 显示帧
+    cv2.imshow('Moving Dot', frame)
+
+    # 等待一段时间以控制帧率
+    key = cv2.waitKey(int(10)) & 0xFF
+
+    # 操作系统接收键盘输入
+    if_continue, all.spaceships[0], all.momentum_weapon, all.scale, all.last_creation_time_0, all.last_presstime_0 = handle_key_0(
+        key, all.spaceships[0], all.momentum_weapon, all.scale, all.last_creation_time_0, all.last_presstime_0)
+    if_continue, all.spaceships[1], all.momentum_weapon, all.scale, all.last_creation_time_1, all.last_presstime_1 = handle_key_1(
+        key, all.spaceships[1], all.momentum_weapon, all.scale, all.last_creation_time_1, all.last_presstime_1)
+
+    all.spaceships, all.momentum_weapon = destroy(all.spaceships, all.momentum_weapon)
+
+    # 如果按下q键，退出(operating模块会自当返回false)
+    if not if_continue:
+        return False,all
+    return True,all    
+
+
+def run0(all,key):
+    # 调用各个文件中的总函数
+
+    # 删除出界的星体和飞船
+    delete(all.stars, all.spaceships, all.momentum_weapon)
+
+    # 引力场移动星体和飞船
+    move(all.stars, all.spaceships, all.momentum_weapon, 0.1)
+
+    # # 创建一个黑色背景的帧
+    # frame = np.zeros((1000, 1000, 3), dtype=np.uint8)
+
+    # # 画图
+    # frame = DrawImage(frame, all.stars, all.spaceships, all.momentum_weapon, all.scale, all.bias_x, all.bias_y)
+
+    # # 显示帧
+    # cv2.imshow('Moving Dot', frame)
+
+    # # 等待一段时间以控制帧率
+    # key = cv2.waitKey(int(10)) & 0xFF
+
+    # 操作系统接收键盘输入
+    if_continue, all.spaceships[0], all.momentum_weapon, all.scale, all.last_creation_time_0, all.last_presstime_0 = handle_key_0(
+        key, all.spaceships[0], all.momentum_weapon, all.scale, all.last_creation_time_0, all.last_presstime_0)
+    if_continue, all.spaceships[1], all.momentum_weapon, all.scale, all.last_creation_time_1, all.last_presstime_1 = handle_key_1(
+        key, all.spaceships[1], all.momentum_weapon, all.scale, all.last_creation_time_1, all.last_presstime_1)
+
+    all.spaceships, all.momentum_weapon = destroy(all.spaceships, all.momentum_weapon)
+
+    # 如果按下q键，退出(operating模块会自当返回false)
+
+
+    ###现在还没有加上q的功能###
+    if not if_continue:
+        return all
+    return all    
+
+
+
 def main():
     # 初始条件
     star_1=star(300, 0.0, 0, 1, 10000)
@@ -53,39 +140,20 @@ def main():
     last_creation_time_1=[time.time(),time.time(),time.time(),time.time(),time.time()]
     last_presstime_1=[time.time(),time.time(),time.time(),time.time(),time.time()]
     
+    all=All(stars,spaceships,momentum_weapon,scale,bias_x,bias_y,
+            last_creation_time_0,last_presstime_0,last_creation_time_1,last_presstime_1)
+
     # 显示帧，这个视频一共有100000帧，总共为1000s
     for i in range(100000):
-
-        #调用各个文件中的总函数
-
-        #删除出界的星体和飞船
-        delete(stars,spaceships, momentum_weapon)
-
-        #引力场移动星体和飞船
-        move(stars, spaceships, momentum_weapon, 0.1)
-
-        # 创建一个黑色背景的帧
-        frame = np.zeros((height, width, 3), dtype=np.uint8)
-
-        #画图
-        frame=DrawImage(frame,stars,spaceships, momentum_weapon,scale,bias_x,bias_y)
-
-        # 显示帧
-        cv2.imshow('Moving Dot', frame)
-
-        # 等待一段时间以控制帧率
-        key = cv2.waitKey(int(10)) & 0xFF
-
-        #操作系统接收键盘输入
-        if_continue, spaceship0, momentum_weapon, scale, last_creation_time_0, last_presstime_0=handle_key_0(key, spaceship0, momentum_weapon, scale,last_creation_time_0, last_presstime_0)
-        if_continue, spaceship1, momentum_weapon, scale, last_creation_time_1, last_presstime_1=handle_key_1(key, spaceship1, momentum_weapon, scale,last_creation_time_1, last_presstime_1)
-
-        spaceships, momentum_weapon=destroy(spaceships, momentum_weapon)
-
-        #如果按下q键，退出(operating模块会自当返回false)
+        # 调用run函数
+        if_continue,all=run(all)
         if(if_continue==False):
             break
-        
+
+def DrawImage0(all):
+    frame=np.zeros((1000, 1000, 3), dtype=np.uint8)
+    DrawImage(frame, all.stars, all.spaceships, all.momentum_weapon, all.scale, all.bias_x, all.bias_y)
+
 #执行主函数
 if __name__ == '__main__':
     main()

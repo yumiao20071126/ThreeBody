@@ -1,1 +1,1 @@
-        move(stars, spaceships, momentum_weapon, 0.1)
+Image

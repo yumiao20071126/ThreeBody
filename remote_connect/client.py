@@ -1,21 +1,45 @@
 import socket
 import threading
 import time
+import pickle
 import keyboard
+
+class Star:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
 
 def receive_messages(client_socket):
     try:
         while True:
-            # 接收服务器发送的数据
-            data = client_socket.recv(1024)
-            string=data.decode()
+            # 接收数据长度
+            raw_length = client_socket.recv(4)
+            if not raw_length:
+                break
+            length = int.from_bytes(raw_length, byteorder='big')
+            
+            # 接收实际数据
+            data = b''
+            while len(data) < length:
+                more_data = client_socket.recv(length - len(data))
+                if not more_data:
+                    break
+                data += more_data
+            ###只要收到信息就打印出来###
             if data:
-                print('收到:', data.decode())
-                print('收到:', string[2])
+                try:
+                    # 反序列化对象
+                    received_object = pickle.loads(data)
+                    if isinstance(received_object, Star):
+                        print(f"Deserialized: x={received_object.x}, y={received_object.y}")
+                    else:
+                        print('收到:', data.decode())
+                except (pickle.UnpicklingError, EOFError):
+                    # 如果反序列化失败，打印原始数据
+                    print('收到:', data.decode())
             else:
                 break
-            # 每秒钟打印一次
-            time.sleep(1)
+            
     finally:
         # 关闭连接
         client_socket.close()
@@ -27,27 +51,6 @@ def send_messages(client_socket):
             if keyboard.is_pressed('w'):
                 client_socket.sendall(b'w')
                 time.sleep(0.1)  # 防止发送过多的消息
-            if keyboard.is_pressed('a'):
-                client_socket.sendall(b'a')
-                time.sleep(0.1)
-            if keyboard.is_pressed('s'):
-                client_socket.sendall(b's')
-                time.sleep(0.1)
-            if keyboard.is_pressed('d'):
-                client_socket.sendall(b'd')
-                time.sleep(0.1)
-            if keyboard.is_pressed('q'):
-                client_socket.sendall(b'q')
-                time.sleep(0.1)
-            if keyboard.is_pressed('e'):
-                client_socket.sendall(b'e')
-                time.sleep(0.1)
-            if keyboard.is_pressed('z'):
-                client_socket.sendall(b'z')
-                time.sleep(0.1)
-            if keyboard.is_pressed('x'):
-                client_socket.sendall(b'x')
-                time.sleep(0.1)
     except Exception as e:
         print(f"发送消息时出错: {e}")
 
