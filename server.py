@@ -6,6 +6,10 @@ from ThreeBody_main import All
 from ThreeBody_main import run0
 from ThreeBody_algorithm import star
 import numpy as np
+import sys
+
+sending_count = 0
+start_time = time.time()
 
 class Star:
     def __init__(self, x, y):
@@ -29,21 +33,16 @@ class Server:
         try:
             while True:
                 data = connection.recv(1024)
+                
                 if data:
                     print('收到:', data.decode())
                     b = data.decode()
+                    print(b)
+                    ord_b=int(b)
                     with self.all_lock:
                         ###处理信息###
-                        self.all=run0(self.all,b)
+                        self.all=run0(self.all,ord_b)
 
-                        print(f"Deserialized: {self.all.stars[0].x}, {self.all.stars[0].y}")
-                    response = data.decode() + " (服务器已收到)"
-                    ###发送信息###
-                    serialized_all = pickle.dumps(self.all)
-                    length = len(serialized_all)
-                    connection.sendall(length.to_bytes(4, byteorder='big'))  # 发送数据长度
-                    connection.sendall(serialized_all)  # 发送序列化对象
-                    notify_event.set()
                 else:
                     print('客户端关闭连接')
                     break
@@ -51,18 +50,33 @@ class Server:
             connection.close()
 
     def send_periodic_message(self, connection, stop_event, notify_event):
+        sending_count = 0
         while not stop_event.is_set():
             try:
-                notify_event.wait(timeout=1)  # 等待通知事件，超时1秒
+                ###每次发送消息时都会对all进行处理，并且控制帧率###
+                notify_event.wait(timeout=0.02)  
                 notify_event.clear()  # 清除事件
                 with self.all_lock:
-                    self.all=run0(self.all, '0')
+                    ###每两帧发送一次###
+                    for i in range(2):
+                        self.all=run0(self.all, ord('0'))
+
                     serialized_all = pickle.dumps(self.all)
                     length = len(serialized_all)
+                    ###发送消息###
                     connection.sendall(length.to_bytes(4, byteorder='big'))  # 发送数据长度
-                    print(length)
                     connection.sendall(serialized_all)  # 发送序列化对象
-                    print(f"Deserialized: {self.all.stars[0].x}, {self.all.stars[0].y}")
+                    sending_count += 1
+
+                    ###测试时间用，如果这里的输出比client中的输出快，则说明网络速度不够###
+                    if sending_count==1:
+                        global start_time
+                        start_time = time.time()
+                    if sending_count % 10==0:
+                        end_time = time.time()
+                        print(f"总时间: {end_time - start_time}")
+                        print(f"发送次数: {sending_count}")
+                    
             except Exception as e:
                 print(f"发送消息时出错: {e}")
                 break
@@ -79,6 +93,7 @@ class Server:
 
 def main():
     # 初始条件
+    start_time = time.time()
     star_1=star(300, 0.0, 0, 1, 10000)
     star_2=star(-300, 0.0, 0, -1, 10000)
     spaceship0=star(50.0, 400.0, 0, 0,0)

@@ -1,1 +1,1 @@
-Image
+sys.exit()

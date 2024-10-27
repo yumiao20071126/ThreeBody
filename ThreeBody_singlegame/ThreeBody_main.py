@@ -69,14 +69,26 @@ def run(all):
     return True,all    
 
 
-def run0(all,key_input):
+def run0(all,key):
     # 调用各个文件中的总函数
-    key=key_input
+
     # 删除出界的星体和飞船
     delete(all.stars, all.spaceships, all.momentum_weapon)
 
     # 引力场移动星体和飞船
     move(all.stars, all.spaceships, all.momentum_weapon, 0.1)
+
+    # # 创建一个黑色背景的帧
+    # frame = np.zeros((1000, 1000, 3), dtype=np.uint8)
+
+    # # 画图
+    # frame = DrawImage(frame, all.stars, all.spaceships, all.momentum_weapon, all.scale, all.bias_x, all.bias_y)
+
+    # # 显示帧
+    # cv2.imshow('Moving Dot', frame)
+
+    # # 等待一段时间以控制帧率
+    # key = cv2.waitKey(int(10)) & 0xFF
 
     # 操作系统接收键盘输入
     if_continue, all.spaceships[0], all.momentum_weapon, all.scale, all.last_creation_time_0, all.last_presstime_0 = handle_key_0(
@@ -85,6 +97,9 @@ def run0(all,key_input):
         key, all.spaceships[1], all.momentum_weapon, all.scale, all.last_creation_time_1, all.last_presstime_1)
 
     all.spaceships, all.momentum_weapon = destroy(all.spaceships, all.momentum_weapon)
+
+    # 如果按下q键，退出(operating模块会自当返回false)
+
 
     ###现在还没有加上q的功能###
     if not if_continue:
@@ -132,8 +147,6 @@ def main():
     for i in range(100000):
         # 调用run函数
         if_continue,all=run(all)
-        all=run0(all,120)
-        all=run0(all,112)
         if(if_continue==False):
             break
 
