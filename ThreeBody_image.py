@@ -1,16 +1,6 @@
 import cv2
 import numpy as np
-# from ThreeBody_algorithm import Gravity
-import time
-import threading
-from ThreeBody_movements import move
-from ThreeBody_algorithm import star
-import keyboard
-from ThreeBody_operating import handle_key_0
-from ThreeBody_operating import handle_key_1
 
-from ThreeBody_delete import delete
-from ThreeBody_destroy import destroy
 
 #这个文件包含了游戏所有的图形化功能
 

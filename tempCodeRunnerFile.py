@@ -1,1 +1,2 @@
-sys.exit()
+    # spaceships.append(spaceship0)
+    # spaceships.append(spaceship1)

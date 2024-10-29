@@ -4,7 +4,6 @@ import time
 import pickle
 import keyboard
 import numpy as np
-from ThreeBody_main import All, run0
 from ThreeBody_algorithm import star
 from ThreeBody_main import DrawImage
 import cv2
@@ -16,15 +15,24 @@ terminate_flag = False
 # 全局计数器，用于记录打印图片的次数
 image_count = 0
 
+scale=1
+bias_x=0
+bias_y=0
+
 def send_key_event(client_socket, event):
     global terminate_flag
+    global scale, bias_x, bias_y
     try:
         ####如果按下的是q，则终止程序####
         if event.name == 'q':
             terminate_flag = True
 
+        if event.name == 'z':
+            scale = scale * 1.25
+        elif event.name == 'x':
+            scale = scale * 0.8
         ###发送的是键码，而不是字符###
-        elif event.name in ['w', 'a', 's', 'd', 'z', 'x', 'e']:
+        elif event.name in ['w', 'a', 's', 'd', 'e']:
             key_code = ord(event.name) if len(event.name) == 1 else event.name  # 获取按键的 ASCII 码或按键名称
             client_socket.sendall(str(key_code).encode())
     except Exception as e:
@@ -72,8 +80,7 @@ def receive_messages(client_socket):
                     # 画图，函数已经的定义过了
                     ###其实可以直接写一个以结构体为自变量的函数###
                     frame = DrawImage(frame, received_object.stars, received_object.spaceships, 
-                                      received_object.momentum_weapon, received_object.scale, 
-                                      received_object.bias_x, received_object.bias_y)
+                                      received_object.momentum_weapon, scale, bias_x, bias_y)
                     
                     # 显示帧
                     cv2.imshow('Moving Dot', frame)
@@ -83,7 +90,7 @@ def receive_messages(client_socket):
                     image_count += 1
 
                     ###测试时间用，如果这里的输出比client中的输出快，则说明网络速度不够###
-                    if image_count % 10 == 0:
+                    if image_count % 50 == 0:
                         print(f"已打印图片次数: {image_count}")
 
                 except (pickle.UnpicklingError, EOFError):
@@ -106,7 +113,7 @@ def start_client():
     # 连接服务器
 
     ###服务器IP地址###
-    server_address = ('183.173.10.23', 65437)  # 替换为服务器的实际IP地址
+    server_address = ('183.173.9.154', 65437)  # 替换为服务器的实际IP地址
     client_socket.connect(server_address)
     print('已连接到', server_address)
     

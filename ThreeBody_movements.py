@@ -56,10 +56,8 @@ def move_momentum_weapon(momentum_weapon, stars, dt):
     if len(momentum_weapon)==0:
         return momentum_weapon
     else:
-        print(momentum_weapon[0].x)
         for i in range(0, len(momentum_weapon)):
             momentum_weapon[i]=velocity(momentum_weapon[i], momentum_weapon[i],dt)
-        print(momentum_weapon[0].x)
 
     return momentum_weapon
     

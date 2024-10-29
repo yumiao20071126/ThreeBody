@@ -1,1 +1,10 @@
-print(ord('q'))
+class star:
+    def __init__(self,x,y,z,name='star'):
+        self.x = x
+        self.y = y
+        self.z = z
+
+STAR=star(1,2,3)
+print(STAR.x)
+print(STAR.name)
+        

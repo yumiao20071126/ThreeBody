@@ -7,7 +7,7 @@ import time
 
 #恒星类，包含坐标和速度和质量，飞船类似，只不过会将m设为0
 class star:
-    def __init__(self, x, y, vx, vy, m):
+    def __init__(self, x, y, vx, vy, m,name='star'):
         self.x = x
         self.y = y
 
@@ -15,6 +15,8 @@ class star:
         self.vy = vy
 
         self.m = m
+
+        self.name=name
 
 #计算两颗星之间的引力加速度
 def Gravity(star_1, star_2, dt):
